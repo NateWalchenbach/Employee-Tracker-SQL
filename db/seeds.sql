@@ -1,13 +1,15 @@
+USE employee_db;
+
 INSERT INTO department (id, name)
 VALUES (1, 'Engineering'),
        (2, 'Finance'),
-       (3, 'Legal / HR'),
+       (3, 'Legal'),
        (4, 'Sales & Marketing');
 
 INSERT INTO role (id, title, salary, department_id)
 VALUES (1, 'CEO', 1000000, NULL),
-       (2, 'CTO', 450000, 1),
-       (3, 'CFO', 500000, 2),
+       (2, 'CTO', 350000, 1),
+       (3, 'CFO', 350000, 2),
 
        (4, 'VP of Product', 200000, 1),
        (5, 'VP of Finance', 200000, 2),
@@ -33,8 +35,21 @@ VALUES (1, 'CEO', 1000000, NULL),
        (22, 'Marketer', 75000, 4);
 
 INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
-VALUES (1, 'Bob' 'Joe', 1, NULL),
-       (2, 'David', 'Gee', 2, 1),
-       (3, 'Nate', 'Walchenabch', 4, 1),
-       (4, 'Maddy', 'Kimborowicz', 6, 1),
-       (5, 'Ashton', 'Demoinz', 7, 1);
+VALUES (1, 'Lee', 'Tod', 1, NULL),
+       (2, 'Mary', 'Cook', 2, 1),
+       (3, 'Tim', 'Underwood', 4, 1),
+       (4, 'Nate', 'Walchenbach', 6, 1),
+       (5, 'Daniel', 'Giezler', 7, 1);
+
+-- These employees have no one reporting to them, so don't need to set an id --
+INSERT INTO employee (first_name, last_name, role_id, manager_id)
+VALUES
+       ('Josh', 'Bob', 18, 2),
+       ('Joe', 'Bobby', 18, 2),
+       ('Steve', 'Wales', 18, 2),
+       ('Alex', 'Watkins', 18, 2),
+       ('Zach', 'Jacobs', 18, 2),
+       ('Austin', 'Christie', 14, 3),
+       ('Tim', 'Cook', 14, 3),
+       ('Rachel', 'Morris', 22, 5),
+       ('Sean', 'Alexander', 18, 2);
