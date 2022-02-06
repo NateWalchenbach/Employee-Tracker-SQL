@@ -29,9 +29,9 @@ async function init() {
       type: "list",
       message: "What would you like do today?",
       choices: [
-        "View all employees", //IP
+        "View all employees", //Done
         "Add Employee", //Done
-        "Update employee role",
+        "Update employee role", //Done
         "View all roles",
         "Add role", //Done
         "View all departments", //Done
@@ -48,7 +48,7 @@ async function init() {
       addEmployee();
       break;
     case "Update employee role":
-      updateRole();
+      updateEmployeeRole();
       break;
     case "View all roles":
       viewAllRoles();
@@ -67,18 +67,25 @@ async function init() {
   init();
 }
 // USER FUNCTIONS HERE --->
-
-// NEW FUNCTION
-// View All Employees: (id, first_name, last_name, title, department, salary, manager)
-// async function viewAllEmployees() {
-//   try {
-//     const results = await db.query(`SELECT`);
-//     console.table(results);
-//   } catch (err) {
-//     console.log(err);
-//   }
-// }
-
+async function viewAllEmployees() {
+  try {
+    const results = await db.query(`
+          SELECT employee.id,
+                 employee.first_name,
+                 employee.last_name,
+                 role.title,
+                 department.name as department,
+                 role.salary,
+                 CONCAT( m.first_name, ' ', m.last_name ) as manager
+          FROM employee
+          JOIN role ON role.id = employee.role_id
+          LEFT JOIN department ON department.id = role.department_id
+          LEFT JOIN employee m ON employee.manager_id = m.id;`);
+    console.table(results);
+  } catch (err) {
+    console.error(err);
+  }
+}
 // NEW FUNCTION
 async function viewAllRoles() {
   try {
@@ -217,5 +224,48 @@ async function addDepartment() {
     console.log(`Added ${name} to the database`);
   } catch (err) {
     console.error(err);
+  }
+}
+async function updateEmployeeRole() {
+  const employees = await db.query(`
+      SELECT id AS value, 
+             CONCAT(first_name, ' ', last_name) AS name
+             FROM employee
+  `);
+
+  const roles = await db.query(`
+      SELECT id AS value,
+             title AS name
+             FROM role
+  `);
+
+  const { id, role_id } = await inquirer.prompt([
+    {
+      type: "list",
+      message: "Which employee would you like to update?",
+      name: "id",
+      choices: employees,
+    },
+    {
+      type: "list",
+      message: "What role should be added?",
+      name: "role_id",
+      choices: roles,
+    },
+  ]);
+
+  // update
+  try {
+    await db.query(
+      `
+          UPDATE employee
+              SET role_id = ?
+              WHERE id = ?;
+      `,
+      [role_id, id]
+    );
+    console.log(`Updated employee ${id}`);
+  } catch (err) {
+    console.log(err);
   }
 }
