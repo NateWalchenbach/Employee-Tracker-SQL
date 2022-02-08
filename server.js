@@ -1,6 +1,7 @@
 const inquirer = require("inquirer");
 const mySql = require("mysql2");
 const consoleTable = require("console.table");
+const util = require("util");
 
 const PORT = process.env.PORT || 3001;
 
@@ -12,15 +13,16 @@ const db = mySql.createConnection(
     user: "root",
     // MySQL password
     password: "frog",
-    database: "employee_db ",
+    database: "employee_db",
   },
   console.log(`Connected to the classlist_db database.`)
 );
+// allows db.query to be async
+db.query = util.promisify(db.query);
 
 // Initial prompt
 // Start the menu loop
 init();
-
 // Starts the application and brings up questions
 async function init() {
   const { action } = await inquirer.prompt([
@@ -268,4 +270,15 @@ async function updateEmployeeRole() {
   } catch (err) {
     console.log(err);
   }
+}
+
+class Account {
+  #pin;
+  constructor(owner, currency, pin) {
+    this.owner = owner;
+    this.currency = currency;
+    this.#pin = pin;
+  }
+
+  getPin;
 }
