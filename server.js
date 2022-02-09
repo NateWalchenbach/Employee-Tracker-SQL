@@ -24,45 +24,50 @@ init();
 async function init() {
   const { action } = await inquirer.prompt([
     {
-      name: "action",
       type: "list",
-      message: "What would you like do today?",
       choices: [
-        "View all employees", //Done
-        "Add Employee", //Done
-        "Update employee role", //Done
-        "View all roles",
-        "Add role", //Done
-        "View all departments", //Done
-        "Add Departments", //Done
+        "View All Employees",
+        "Add Employee",
+        "Update Employee Role",
+        "View All Roles",
+        "Add Role",
+        "View All Departments",
+        "Add Department",
+        "Quit",
       ],
+      message: "What would you like to do?",
+      name: "action",
     },
   ]);
-  // Initial inquirer prompt w/ switch case
+
   switch (action) {
-    case "View all employees":
-      viewAllEmployees();
+    case "View All Employees":
+      await viewAllEmployees();
       break;
     case "Add Employee":
-      addEmployee();
+      await addEmployee();
       break;
-    case "Update employee role":
-      updateEmployeeRole();
+    case "Update Employee Role":
+      await updateEmployeeRole();
       break;
-    case "View all roles":
-      viewAllRoles();
+    case "View All Roles":
+      await viewAllRoles();
       break;
-    case "Add role":
-      addRole();
+    case "Add Role":
+      await addRole();
       break;
-    case "View all departments":
-      viewAllDepartments();
+    case "View All Departments":
+      await viewAllDepartments();
       break;
-    case "Add Departments":
-      addDepartment();
+    case "Add Department":
+      await addDepartment();
       break;
+    case "Quit":
+    default:
+      db.end();
+      return null;
   }
-  // Call menu function
+
   init();
 }
 // USER FUNCTIONS HERE --->
