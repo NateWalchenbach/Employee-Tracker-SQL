@@ -70,7 +70,30 @@ async function init() {
 
   init();
 }
-// USER FUNCTIONS HERE --->
+async function viewAllDepartments() {
+  try {
+    const results = await db.query("SELECT * FROM department");
+    console.table(results);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function viewAllRoles() {
+  try {
+    const results = await db.query(`
+          SELECT role.id,
+                 role.title,
+                 department.name as department,
+                 role.salary
+          FROM role
+          LEFT JOIN department ON department.id = role.department_id;`);
+    console.table(results);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 async function viewAllEmployees() {
   try {
     const results = await db.query(`
@@ -90,24 +113,67 @@ async function viewAllEmployees() {
     console.error(err);
   }
 }
-// NEW FUNCTION
-async function viewAllRoles() {
+
+async function addDepartment() {
+  const { name } = await inquirer.prompt([
+    {
+      type: "input",
+      message: "What is the new department name?",
+      name: "name",
+    },
+  ]);
+
   try {
-    const results = await db.query(`
-        SELECT role.id,
-               role.title,
-               department.name as department,
-               role.salary
-        FROM role
-        LEFT JOIN department ON department.id = role.department_id;`);
-    console.table(results);
+    await db.query(
+      `
+          INSERT INTO department (name)
+          VALUES (?)
+          `,
+      name
+    );
+    console.log(`Added ${name} to the database`);
   } catch (err) {
     console.error(err);
   }
 }
 
-// NEW FUNCTION
-// Prompts the user to add an Employee
+async function addRole() {
+  // get department choices from the database
+  let deptChoices = await db.query("SELECT id AS value, name FROM department");
+
+  const { title, salary, department_id } = await inquirer.prompt([
+    {
+      type: "input",
+      message: "What is the title of the new role?",
+      name: "title",
+    },
+    {
+      type: "number",
+      message: "What is the salary for the role?",
+      name: "salary",
+    },
+    {
+      type: "list",
+      choices: deptChoices,
+      message: "Which department is this role in?",
+      name: "department_id",
+    },
+  ]);
+
+  try {
+    await db.query(
+      `
+              INSERT INTO role (title, salary, department_id)
+                  VALUES (?, ?, ?)
+          `,
+      [title, salary, department_id]
+    );
+    console.log(`Added ${title} to the database`);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 async function addEmployee() {
   // get role choices from the database
   let roleChoices = await db.query(
@@ -154,121 +220,6 @@ async function addEmployee() {
       [first_name, last_name, role_id, manager_id]
     );
     console.log(`Added ${first_name} ${last_name} to the database`);
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-// NEW FUNCTION
-// Prompts user to get
-async function viewAllDepartments() {
-  try {
-    const results = await db.query(`SELECT * FROM Departments`);
-    console.table(results);
-  } catch (err) {
-    console.log(err);
-  }
-}
-async function addRole() {
-  // get department choices from the database
-  let deptChoices = await db.query("SELECT id AS value, name FROM department");
-
-  const { title, salary, department_id } = await inquirer.prompt([
-    {
-      type: "input",
-      message: "What is the title of the new role?",
-      name: "title",
-    },
-    {
-      type: "number",
-      message: "What is the salary for the role?",
-      name: "salary",
-    },
-    {
-      type: "list",
-      choices: deptChoices,
-      message: "Which department is this role in?",
-      name: "department_id",
-    },
-  ]);
-
-  try {
-    await db.query(
-      `
-              INSERT INTO role (title, salary, department_id)
-                  VALUES (?, ?, ?)
-          `,
-      [title, salary, department_id]
-    );
-    console.log(`Added ${title} to the database`);
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-// NEW FUNCTION
-// Add a department to the table
-async function addDepartment() {
-  const { name } = await inquirer.prompt([
-    {
-      type: "input",
-      message: "What is the name of the department you would like to add",
-      name: "name",
-    },
-  ]);
-
-  try {
-    await db.query(
-      `
-          INSERT INTO department (name)
-          VALUES (?)
-          `,
-      name
-    );
-    console.log(`Added ${name} to the database`);
-  } catch (err) {
-    console.error(err);
-  }
-}
-async function updateEmployeeRole() {
-  const employees = await db.query(`
-      SELECT id AS value, 
-             CONCAT(first_name, ' ', last_name) AS name
-             FROM employee
-  `);
-
-  const roles = await db.query(`
-      SELECT id AS value,
-             title AS name
-             FROM role
-  `);
-
-  const { id, role_id } = await inquirer.prompt([
-    {
-      type: "list",
-      message: "Which employee would you like to update?",
-      name: "id",
-      choices: employees,
-    },
-    {
-      type: "list",
-      message: "What role should be added?",
-      name: "role_id",
-      choices: roles,
-    },
-  ]);
-
-  // update
-  try {
-    await db.query(
-      `
-          UPDATE employee
-              SET role_id = ?
-              WHERE id = ?;
-      `,
-      [role_id, id]
-    );
-    console.log(`Updated employee ${id}`);
   } catch (err) {
     console.log(err);
   }
