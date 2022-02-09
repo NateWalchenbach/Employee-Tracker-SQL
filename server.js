@@ -1,22 +1,19 @@
 const inquirer = require("inquirer");
-const mySql = require("mysql2");
-const consoleTable = require("console.table");
 const util = require("util");
+const mysql = require("mysql2");
+const cTable = require("console.table");
 
 const PORT = process.env.PORT || 3001;
 
 // Connect to database
-const db = mySql.createConnection(
-  {
-    host: "localhost",
-    // MySQL username,
-    user: "root",
-    // MySQL password
-    password: "frog",
-    database: "employee_db",
-  },
-  console.log(`Connected to the classlist_db database.`)
-);
+const db = mysql.createConnection({
+  host: "127.0.0.1",
+  // MySQL username,
+  user: "root",
+  // MySQL password
+  password: "frog",
+  database: "employee_db",
+});
 // allows db.query to be async
 db.query = util.promisify(db.query);
 
@@ -270,15 +267,4 @@ async function updateEmployeeRole() {
   } catch (err) {
     console.log(err);
   }
-}
-
-class Account {
-  #pin;
-  constructor(owner, currency, pin) {
-    this.owner = owner;
-    this.currency = currency;
-    this.#pin = pin;
-  }
-
-  getPin;
 }
