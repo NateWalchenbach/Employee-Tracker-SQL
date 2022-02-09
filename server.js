@@ -138,7 +138,6 @@ async function addDepartment() {
 }
 
 async function addRole() {
-  // get department choices from the database
   let deptChoices = await db.query("SELECT id AS value, name FROM department");
 
   const { title, salary, department_id } = await inquirer.prompt([
@@ -175,12 +174,10 @@ async function addRole() {
 }
 
 async function addEmployee() {
-  // get role choices from the database
   let roleChoices = await db.query(
     "SELECT id AS value, title AS name FROM role"
   );
 
-  // get manager choices from the database
   let managerChoices = await db.query(`
       SELECT id as value, 
              CONCAT( first_name, ' ', last_name ) as name 
@@ -220,6 +217,48 @@ async function addEmployee() {
       [first_name, last_name, role_id, manager_id]
     );
     console.log(`Added ${first_name} ${last_name} to the database`);
+  } catch (err) {
+    console.log(err);
+  }
+}
+async function updateEmployeeRole() {
+  const employees = await db.query(`
+      SELECT id AS value, 
+             CONCAT(first_name, ' ', last_name) AS name
+             FROM employee
+  `);
+
+  const roles = await db.query(`
+      SELECT id AS value,
+             title AS name
+             FROM role
+  `);
+
+  const { id, role_id } = await inquirer.prompt([
+    {
+      type: "list",
+      message: "Which employee would you like to update?",
+      name: "id",
+      choices: employees,
+    },
+    {
+      type: "list",
+      message: "Which role should be added?",
+      name: "role_id",
+      choices: roles,
+    },
+  ]);
+
+  try {
+    await db.query(
+      `
+          UPDATE employee
+              SET role_id = ?
+              WHERE id = ?;
+      `,
+      [role_id, id]
+    );
+    console.log(`Updated employee ${id}`);
   } catch (err) {
     console.log(err);
   }
