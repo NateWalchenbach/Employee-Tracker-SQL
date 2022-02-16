@@ -36,7 +36,7 @@ THEN I am prompted to select an employee to update and their new role and this i
 
 ## Video
 
-[!video]https://drive.google.com/file/d/1iYEJXZPf3NVPbiNlGsK47GlYUtfp921w/view?usp=sharing
+[![Watch The Video]]https://drive.google.com/file/d/1iYEJXZPf3NVPbiNlGsK47GlYUtfp921w/view?usp=sharing
 
 ## Technologies Used
 
